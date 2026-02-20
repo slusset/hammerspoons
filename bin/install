@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+target="$HOME/.hammerspoon"
+
+if [[ -L "$target" ]]; then
+  current="$(readlink "$target")"
+  if [[ "$current" == "$repo_dir" ]]; then
+    echo "Already linked: $target -> $repo_dir"
+    exit 0
+  fi
+fi
+
+if [[ -e "$target" && ! -L "$target" ]]; then
+  backup="$HOME/.hammerspoon.backup.$(date +%Y%m%d-%H%M%S)"
+  mv "$target" "$backup"
+  echo "Backed up existing ~/.hammerspoon to $backup"
+fi
+
+ln -sfn "$repo_dir" "$target"
+echo "Linked $target -> $repo_dir"
+
+if [[ ! -f "$repo_dir/config/local.lua" && -f "$repo_dir/config/local.example.lua" ]]; then
+  cp "$repo_dir/config/local.example.lua" "$repo_dir/config/local.lua"
+  echo "Created local override: config/local.lua"
+fi
+

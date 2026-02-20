@@ -1,0 +1,42 @@
+return {
+  windowTiling = {
+    -- Match Rectangle export defaults.
+    screenMargin = 0,
+    windowMargin = 8,
+    resizeStepPixels = 30,
+    hotkeys = {
+      left = { { "cmd", "alt" }, "Left" },
+      right = { { "cmd", "alt" }, "Right" },
+      top = { { "cmd", "alt" }, "Up" },
+      bottom = { { "cmd", "alt" }, "Down" },
+      topLeft = { { "cmd", "ctrl" }, "Left" },
+      topRight = { { "cmd", "ctrl" }, "Right" },
+      bottomLeft = { { "cmd", "ctrl", "shift" }, "Left" },
+      bottomRight = { { "cmd", "ctrl", "shift" }, "Right" },
+      center = { { "cmd", "alt" }, "C" },
+      maximize = { { "cmd", "alt" }, "F" },
+      maximizeHeight = { { "ctrl", "alt", "shift" }, "Up" },
+      larger = { { "ctrl", "alt", "shift" }, "Right" },
+      smaller = { { "ctrl", "alt", "shift" }, "Left" },
+      nextScreen = { { "cmd", "ctrl", "alt" }, "Right" },
+      previousScreen = { { "cmd", "ctrl", "alt" }, "Left" },
+      restore = { { "ctrl", "alt" }, "delete" },
+    },
+  },
+  awake = {
+    whenExternalDisplay = true,
+    requireClamshell = true,
+    requireACPower = true,
+    preventDisplaySleep = false,
+    manualToggleHotkey = { { "ctrl", "alt", "cmd" }, "A" },
+  },
+  jiggler = {
+    enabled = true,
+    intervalSeconds = 300,
+    mode = "zen",
+    whenExternalDisplay = true,
+    requireClamshell = true,
+    requireACPower = true,
+    toggleHotkey = { { "ctrl", "alt", "cmd" }, "J" },
+  },
+}

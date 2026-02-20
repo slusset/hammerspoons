@@ -1,0 +1,7 @@
+return {
+  -- Copy this file to config/overrides/hosts/<normalized-hostname>.lua
+  -- Example hostname normalization:
+  -- "Ted's MacBook Pro" -> ted_s_macbook_pro
+  --
+  -- Place host-specific overrides here, such as monitor-specific hotkeys.
+}
