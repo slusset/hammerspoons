@@ -18,6 +18,8 @@ This repo is a shared, modular Hammerspoon setup designed to replace:
 - `config/local.lua`: local-only overrides (gitignored)
 - `scripts/`: shell scripts callable from hotkeys
 - `bin/install`: symlink repo to `~/.hammerspoon`
+- `dotfiles/tmux/.tmux.conf`: shared tmux config
+- `bin/install-tmux`: symlink tmux config to `~/.tmux.conf`
 
 ## Install
 
@@ -26,6 +28,12 @@ This repo is a shared, modular Hammerspoon setup designed to replace:
 ```
 
 Then open/reload Hammerspoon.
+
+Install tmux config:
+
+```bash
+./bin/install-tmux
+```
 
 ## How configuration layers merge
 

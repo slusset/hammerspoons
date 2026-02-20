@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source_file="$repo_dir/dotfiles/tmux/.tmux.conf"
+target="$HOME/.tmux.conf"
+
+if [[ ! -f "$source_file" ]]; then
+  echo "Missing source file: $source_file" >&2
+  exit 1
+fi
+
+if [[ -L "$target" ]]; then
+  current="$(readlink "$target")"
+  if [[ "$current" == "$source_file" ]]; then
+    echo "Already linked: $target -> $source_file"
+    exit 0
+  fi
+fi
+
+if [[ -e "$target" && ! -L "$target" ]]; then
+  backup="$HOME/.tmux.conf.backup.$(date +%Y%m%d-%H%M%S)"
+  mv "$target" "$backup"
+  echo "Backed up existing ~/.tmux.conf to $backup"
+fi
+
+ln -sfn "$source_file" "$target"
+echo "Linked $target -> $source_file"
