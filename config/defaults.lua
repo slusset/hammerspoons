@@ -3,6 +3,15 @@ return {
   notifications = {
     enabled = true,
   },
+  ipc = {
+    enabled = true,
+    autoInstallCLI = false,
+  },
+  outlookAX = {
+    enabled = true,
+    defaultDepth = 6,
+    defaultMaxNodes = 700,
+  },
   reload = {
     watchConfigDir = true,
     hotkey = { { "cmd", "alt", "ctrl" }, "R" },

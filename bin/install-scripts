@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+bin_dir="$HOME/.local/bin"
+force="false"
+
+usage() {
+  cat <<EOF
+Usage:
+  $(basename "$0") [--bin-dir PATH] [--force]
+
+Installs symlinks so Outlook scripts can run from any directory:
+  outlook-mail -> scripts/outlook_mail.sh
+  outlook-gui  -> scripts/outlook_gui.sh
+  outlook-ax   -> scripts/outlook_ax.sh
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --bin-dir)
+      if [[ -z "${2:-}" ]]; then
+        echo "Missing value for --bin-dir" >&2
+        exit 1
+      fi
+      bin_dir="$2"
+      shift 2
+      ;;
+    --force)
+      force="true"
+      shift
+      ;;
+    -h|--help|help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+mkdir -p "$bin_dir"
+
+link_script() {
+  local cmd_name="$1"
+  local rel_src="$2"
+  local src="$repo_dir/$rel_src"
+  local dst="$bin_dir/$cmd_name"
+
+  if [[ ! -x "$src" ]]; then
+    echo "Skipping $cmd_name: source not executable: $src" >&2
+    return
+  fi
+
+  if [[ -e "$dst" || -L "$dst" ]]; then
+    local current=""
+    if [[ -L "$dst" ]]; then
+      current="$(readlink "$dst" || true)"
+    fi
+    if [[ "$current" == "$src" ]]; then
+      echo "Already linked: $dst -> $src"
+      return
+    fi
+
+    if [[ "$force" != "true" ]]; then
+      echo "Skipping existing path (use --force to replace): $dst" >&2
+      return
+    fi
+
+    local backup="${dst}.backup.$(date +%Y%m%d-%H%M%S)"
+    mv "$dst" "$backup"
+    echo "Backed up existing path: $dst -> $backup"
+  fi
+
+  ln -sfn "$src" "$dst"
+  echo "Linked: $dst -> $src"
+}
+
+link_script "outlook-mail" "scripts/outlook_mail.sh"
+link_script "outlook-gui" "scripts/outlook_gui.sh"
+link_script "outlook-ax" "scripts/outlook_ax.sh"
+
+case ":$PATH:" in
+  *":$bin_dir:"*)
+    ;;
+  *)
+    echo
+    echo "Note: $bin_dir is not currently in PATH."
+    echo "Add this to your shell profile:"
+    echo "  export PATH=\"$bin_dir:\$PATH\""
+    ;;
+esac

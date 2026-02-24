@@ -35,6 +35,20 @@ Install tmux config:
 ./bin/install-tmux
 ```
 
+Install global CLI links for Outlook helper scripts:
+
+```bash
+./bin/install-scripts
+```
+
+This creates these commands in `~/.local/bin`:
+
+- `outlook-mail`
+- `outlook-gui`
+- `outlook-ax`
+
+Use `--bin-dir PATH` to install elsewhere and `--force` to replace existing paths.
+
 ## How configuration layers merge
 
 Load order (last wins):
@@ -121,3 +135,93 @@ Useful settings:
 3. Copy `config/overrides/hosts/example_host.lua.example` to
    `config/overrides/hosts/<normalized-hostname>.lua`.
 4. Add machine-specific overrides in that file.
+
+## Outlook GUI CLI script
+
+Use `scripts/outlook_gui.sh` when an agent needs to drive Outlook from CLI on macOS.
+
+Examples:
+
+```bash
+scripts/outlook_gui.sh focus
+scripts/outlook_gui.sh new-message
+scripts/outlook_gui.sh compose --to "person@example.com" --subject "Status" --body "Draft body"
+scripts/outlook_gui.sh compose --to "person@example.com" --subject "Status" --body "Ready to send" --send
+scripts/outlook_gui.sh compose --to "person@example.com" --subject "Status" --body "Hello" --pre-to-tabs 1
+scripts/outlook_gui.sh compose --to "person@example.com" --subject "Status" --body "Hello" --step-wait 0.15
+scripts/outlook_gui.sh compose-ax --to "person@example.com" --subject "Status" --body "Hello"
+scripts/outlook_gui.sh compose-ax --to "person@example.com" --subject "Status" --body "Hello" --send --send-mode button
+scripts/outlook_gui.sh search --query "incident 12345"
+scripts/outlook_gui.sh send-current
+scripts/outlook_gui.sh send-current --method button
+```
+
+Compose note:
+
+- `--pre-to-tabs` controls how many initial `Tab` presses happen before filling the `To:` value.
+- Default is `0` because current Outlook compose windows start focused in `To:`.
+- Set `1` only if your compose flow starts focus on `From:` or another control first.
+- `--step-wait` (default `0.12`) adds a short delay between tabs/pastes so Outlook focus updates reliably.
+- `compose-ax` uses Hammerspoon AX identifiers (`toTextField`, `subjectTextField`) and is generally more reliable than tab-count targeting.
+- AX sending supports `--send-mode keystroke` (Cmd+Return) or `--send-mode button` (click Send via accessibility).
+- `send-current --method button` clicks the visible Send button via AX; `--method keystroke` uses Cmd+Return.
+
+Requirements:
+
+- Microsoft Outlook installed
+- Calling terminal/agent allowed under macOS `System Settings > Privacy & Security > Accessibility`
+- Outlook automation allowed under `System Settings > Privacy & Security > Automation`
+
+## Outlook AX inspection via Hammerspoon CLI
+
+Use `scripts/outlook_ax.sh` to inspect Outlook compose accessibility elements and field counts.
+
+Examples:
+
+```bash
+scripts/outlook_ax.sh counts
+scripts/outlook_ax.sh dump --depth 7 --max-nodes 1000
+scripts/outlook_ax.sh focused
+```
+
+Expected workflow for field-count issues:
+
+1. Open Outlook compose window and focus it.
+2. Run `scripts/outlook_ax.sh counts` to see editable candidates.
+3. Run `scripts/outlook_ax.sh dump` for full tree when counts look wrong.
+4. Adjust `scripts/outlook_gui.sh compose --pre-to-tabs N` based on findings.
+
+Requirements:
+
+- Hammerspoon running with this config loaded
+- `hs` CLI installed and in `PATH`
+- `hs.ipc` available (this repo now loads `modules/ipc.lua` by default)
+
+## Outlook mailbox CLI (AppleScript model)
+
+Use `scripts/outlook_mail.sh` to read/search/summarize/prioritize messages without Graph API.
+
+Examples:
+
+```bash
+scripts/outlook_mail.sh search --folder inbox --topic "incident" --from "alerts@"
+scripts/outlook_mail.sh search --folder sent --to "person@example.com" --limit 25
+scripts/outlook_mail.sh read --id 123456
+scripts/outlook_mail.sh summarize --id 123456
+scripts/outlook_mail.sh prioritize --folder inbox --unread --top 15 --vip "manager@vumc.org,lead@vumc.org"
+```
+
+Folder options:
+
+- Shortcut names: `inbox`, `sent`, `drafts`, `deleted`, `junk`, `outbox`
+- Or pass an exact Outlook mail-folder name.
+
+Work-laptop scope:
+
+- Default scope is `work`.
+- Set host allowlist once:
+  `export OUTLOOK_WORK_HOSTS="work_laptop_host_name"`
+- Run on allowed hosts only:
+  `scripts/outlook_mail.sh search --folder inbox`
+- Bypass scope for testing:
+  `scripts/outlook_mail.sh search --folder inbox --scope any`
