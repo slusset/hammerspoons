@@ -7,6 +7,7 @@ US=$'\x1f'
 print_usage() {
   cat <<EOF
 Usage:
+  ${SCRIPT_NAME} probe [--scope SCOPE] [--work-hosts CSV]
   ${SCRIPT_NAME} search [--folder NAME] [--topic TEXT|--query TEXT] [--from TEXT] [--to TEXT] [--unread] [--limit N] [--scan-limit N] [--scope SCOPE] [--work-hosts CSV]
   ${SCRIPT_NAME} read --id ID [--folder NAME] [--scope SCOPE] [--work-hosts CSV]
   ${SCRIPT_NAME} summarize --id ID [--folder NAME] [--scope SCOPE] [--work-hosts CSV]
@@ -15,6 +16,7 @@ Usage:
 
 Notes:
   - Uses Outlook AppleScript model (no Graph API required).
+  - Use "probe" for quick connectivity checks (version, account count, inbox count).
   - Folder shortcuts: inbox, sent, drafts, deleted, junk, outbox.
   - Scope defaults to "work". Configure OUTLOOK_WORK_HOSTS=host1,host2 or pass --work-hosts.
   - Use --scope any to bypass host scoping for testing.
@@ -112,6 +114,77 @@ shorten() {
 
 to_lower() {
   printf '%s' "${1:-}" | tr '[:upper:]' '[:lower:]'
+}
+
+cmd_probe() {
+  local scope="work"
+  local work_hosts="${OUTLOOK_WORK_HOSTS:-}"
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --scope)
+        require_value "$1" "${2:-}"
+        scope="$2"
+        shift 2
+        ;;
+      --work-hosts)
+        require_value "$1" "${2:-}"
+        work_hosts="$2"
+        shift 2
+        ;;
+      *)
+        echo "Unknown option for probe: $1" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  enforce_scope "$scope" "$work_hosts"
+
+  local raw
+  raw="$(osascript <<'APPLESCRIPT'
+on run
+  tell application "Microsoft Outlook"
+    set outlookVersion to version as text
+
+    set exchangeAccountCount to "-1"
+    try
+      set exchangeAccountCount to (count of every exchange account) as text
+    on error
+      try
+        set exchangeAccountCount to (count of every account) as text
+      on error
+        set exchangeAccountCount to "-1"
+      end try
+    end try
+
+    set inboxMessageCount to "-1"
+    try
+      set inboxMessageCount to (count of messages of inbox) as text
+    on error
+      try
+        set inboxMessageCount to (count of every message of inbox) as text
+      on error
+        set inboxMessageCount to "-1"
+      end try
+    end try
+
+    return outlookVersion & (ASCII character 31) & exchangeAccountCount & (ASCII character 31) & inboxMessageCount
+  end tell
+end run
+APPLESCRIPT
+)"
+
+  local outlook_version exchange_accounts inbox_messages
+  IFS="$US" read -r outlook_version exchange_accounts inbox_messages <<<"$raw"
+  echo "Outlook version: ${outlook_version:-unknown}"
+  echo "Exchange accounts: ${exchange_accounts:-unknown}"
+  echo "Inbox messages: ${inbox_messages:-unknown}"
+
+  if [[ "${exchange_accounts:-0}" == "0" || "${inbox_messages:-0}" == "0" ]]; then
+    echo "Warning: Outlook is reachable but mailbox data may not be visible to AppleScript."
+    echo "Try switching to Legacy/Classic Outlook mode and retry."
+  fi
 }
 
 fetch_messages() {
@@ -920,6 +993,9 @@ main() {
   case "$cmd" in
     help|-h|--help)
       print_usage
+      ;;
+    probe)
+      cmd_probe "$@"
       ;;
     search)
       cmd_search "$@"
