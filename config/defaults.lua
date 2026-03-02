@@ -20,7 +20,7 @@ return {
     enabled = true,
     screenMargin = 8,
     windowMargin = 8,
-    centerSize = { w = 0.64, h = 0.82 },
+    centerSize = { w = 0.48, h = 0.82 },
     hotkeys = {
       left = { { "ctrl", "alt" }, "Left" },
       right = { { "ctrl", "alt" }, "Right" },
