@@ -24,10 +24,6 @@ return {
     hotkeys = {
       left = { { "ctrl", "alt" }, "Left" },
       right = { { "ctrl", "alt" }, "Right" },
-      top = { { "ctrl", "alt" }, "Up" },
-      bottom = { { "ctrl", "alt" }, "Down" },
-      topLeft = { { "ctrl", "alt", "cmd" }, "Left" },
-      topRight = { { "ctrl", "alt", "cmd" }, "Right" },
       bottomLeft = { { "ctrl", "alt", "cmd" }, "Down" },
       bottomRight = { { "ctrl", "alt", "cmd" }, "Up" },
       maximize = { { "ctrl", "alt" }, "Return" },

@@ -7,10 +7,6 @@ return {
     hotkeys = {
       left = { { "cmd", "alt" }, "Left" },
       right = { { "cmd", "alt" }, "Right" },
-      top = { { "cmd", "alt" }, "Up" },
-      bottom = { { "cmd", "alt" }, "Down" },
-      topLeft = { { "cmd", "ctrl" }, "Left" },
-      topRight = { { "cmd", "ctrl" }, "Right" },
       bottomLeft = { { "cmd", "ctrl", "shift" }, "Left" },
       bottomRight = { { "cmd", "ctrl", "shift" }, "Right" },
       center = { { "cmd", "alt" }, "C" },
