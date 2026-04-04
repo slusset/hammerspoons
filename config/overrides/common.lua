@@ -20,7 +20,9 @@ return {
     },
   },
   awake = {
-    whenExternalDisplay = true,
+    -- KVM switching can temporarily hide the external display; gate by AC +
+    -- clamshell instead of current external-display visibility.
+    whenExternalDisplay = false,
     requireClamshell = true,
     requireACPower = true,
     preventDisplaySleep = false,
@@ -30,7 +32,7 @@ return {
     enabled = true,
     intervalSeconds = 300,
     mode = "zen",
-    whenExternalDisplay = true,
+    whenExternalDisplay = false,
     requireClamshell = true,
     requireACPower = true,
     toggleHotkey = { { "ctrl", "alt", "cmd" }, "J" },

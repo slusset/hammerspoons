@@ -29,7 +29,9 @@ local function get_display_state()
 
   return {
     has_external = has_external,
-    clamshell_likely = has_external and not has_internal,
+    -- Treat "no internal display present" as clamshell-likely so a KVM that
+    -- temporarily hides the external monitor does not disable desk-mode logic.
+    clamshell_likely = not has_internal,
   }
 end
 

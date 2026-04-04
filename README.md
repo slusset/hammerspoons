@@ -109,6 +109,10 @@ Useful settings:
 - `preventDisplaySleep`: keep displays awake too (default `false`)
 - `manualToggleHotkey`: toggle manual awake override (default `ctrl`+`alt`+`cmd`+`A`)
 
+This repo's shared override narrows the policy to **plugged-in clamshell mode**.
+That keeps desk-mode wake prevention active even if a KVM briefly hides the
+external display from macOS.
+
 ### Jiggler-style activity
 
 Use `modules/jiggler.lua`.
@@ -118,6 +122,9 @@ Useful settings:
 - `intervalSeconds`: jiggle/poke interval (`300` = 5 minutes)
 - `mode`: `zen` (invisible) or `mouse` (1px move + restore)
 - `toggleHotkey`: pause/resume jiggler (default `ctrl`+`alt`+`cmd`+`J`)
+
+This repo's shared override also gates jiggler by **AC power + clamshell** so
+normal unplugged/open-laptop power management is left alone.
 
 ## Recommended workflow across two laptops
 
