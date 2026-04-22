@@ -134,6 +134,9 @@ normal unplugged/open-laptop power management is left alone.
 4. Add new automation as one module per concern under `modules/`.
 5. Keep module defaults in `config/defaults.lua` and avoid hard-coding paths.
 
+Example: keep `awake`/`jiggler` enabled on a MacBook Pro host, but disable
+them on a MacBook Air host that relies on Amphetamine instead.
+
 ## First-time setup per laptop
 
 1. Run `./bin/install`.
