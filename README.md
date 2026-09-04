@@ -5,6 +5,7 @@ This repo is a shared, modular Hammerspoon setup designed to replace:
 - Rectangle window tiling
 - BetterTouchTool keystroke interception and script execution
 - Amphetamine-style "stay awake" automation for external monitor workflows
+- Dell KVM-aware Magic Trackpad and Magic Mouse handoff
 
 ## Layout
 
@@ -125,6 +126,31 @@ Useful settings:
 
 This repo's shared override also gates jiggler by **AC power + clamshell** so
 normal unplugged/open-laptop power management is left alone.
+
+### Dell KVM Bluetooth handoff
+
+`modules/dell_kvm.lua` binds `ctrl`+`shift`+`1` and treats attachment of the
+configured Dell display as the Bluetooth ownership signal. The active Mac
+safely ejects the configured keyfob, disconnects only the configured Magic
+Trackpad and Mouse, and switches the monitor input. When the Dell display
+appears on the other Mac, its screen watcher claims those two devices.
+
+First-time setup on **both** Macs:
+
+1. Install the Bluetooth CLI: `brew install blueutil`.
+2. Pair the Trackpad and Mouse with each Mac once.
+3. Allow Hammerspoon under **System Settings > Privacy & Security > Bluetooth**.
+4. Install/reload this Hammerspoon configuration.
+5. Keep Hammerspoon and the destination Mac awake while switching.
+
+Device addresses and the keyfob volume UUID live in
+`config/overrides/common.lua`. Generic timing, input values, and binary paths
+live under `dellKvm` in `config/defaults.lua`.
+
+The old `~/Scripts/switch-dell-monitor.sh` helper is no longer invoked by the
+hotkey. The tracked `scripts/switch-dell-monitor.sh` version validates the
+current input and command results, and attempts to reconnect local Bluetooth
+devices if the monitor switch fails.
 
 ## Recommended workflow across two laptops
 

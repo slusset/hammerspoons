@@ -1,4 +1,12 @@
 return {
+  dellKvm = {
+    enabled = true,
+    keyfobVolumeUUID = "5CCAA7C9-F028-3C33-83BF-D05BB4BAC9C0",
+    bluetoothDevices = {
+      { name = "Magic Trackpad", address = "D0-C0-50-D3-45-F1" },
+      { name = "Ted Slusser's Mouse", address = "30-D9-D9-8B-D8-CF" },
+    },
+  },
   windowTiling = {
     -- Match Rectangle export defaults.
     screenMargin = 0,

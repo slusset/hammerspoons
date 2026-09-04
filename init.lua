@@ -5,9 +5,8 @@ local log = hs.logger.new("init", config.logLevel or "info")
 local modules = {
   "modules.reload",
   "modules.ipc",
-  "modules.outlook_ax",
-  "modules.window_tiling",
   "modules.keystrokes",
+  "modules.dell_kvm",
   "modules.awake",
   "modules.jiggler",
 }
