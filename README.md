@@ -4,8 +4,7 @@ This repo is a shared, modular Hammerspoon setup designed to replace:
 
 - Rectangle window tiling
 - BetterTouchTool keystroke interception and script execution
-- Amphetamine-style "stay awake" automation for external monitor workflows
-- Dell KVM-aware Magic Trackpad and Magic Mouse handoff
+- Dell monitor input switching
 
 ## Layout
 
@@ -98,59 +97,30 @@ Example:
 }
 ```
 
-### Amphetamine-style awake behavior
+### Dell monitor input switching
 
-Use `modules/awake.lua`.
-It enables idle sleep prevention when your configured conditions are met (by default: external display attached and AC power present).
+Control–Shift–1 runs `scripts/switch-dell-monitor.sh` from the Hammerspoon
+config directory. The script reads the current Dell input, safely ejects the
+configured keyfob if mounted, and switches to the other input.
 
-Tune behavior via `awake` settings in config.
-Useful settings:
+Install `m1ddc` on both Macs. The keyfob volume UUID lives in
+`config/overrides/common.lua`. Display number, input values, and the
+`m1ddc` path default to the values in `config/defaults.lua`. Use Amphetamine
+directly for sleep prevention.
 
-- `requireClamshell`: require external-only display state
-- `preventDisplaySleep`: keep displays awake too (default `false`)
-- `manualToggleHotkey`: toggle manual awake override (default `ctrl`+`alt`+`cmd`+`A`)
+To inspect the monitor without switching inputs, run:
 
-This repo's shared override narrows the policy to **plugged-in clamshell mode**.
-That keeps desk-mode wake prevention active even if a KVM briefly hides the
-external display from macOS.
+```sh
+/opt/homebrew/bin/m1ddc display list
+/opt/homebrew/bin/m1ddc display 1 get input
+```
 
-### Jiggler-style activity
-
-Use `modules/jiggler.lua`.
-Default behavior is a 5-minute `zen` poke with no visible cursor movement.
-Useful settings:
-
-- `intervalSeconds`: jiggle/poke interval (`300` = 5 minutes)
-- `mode`: `zen` (invisible) or `mouse` (1px move + restore)
-- `toggleHotkey`: pause/resume jiggler (default `ctrl`+`alt`+`cmd`+`J`)
-
-This repo's shared override also gates jiggler by **AC power + clamshell** so
-normal unplugged/open-laptop power management is left alone.
-
-### Dell KVM Bluetooth handoff
-
-`modules/dell_kvm.lua` binds `ctrl`+`shift`+`1` and treats attachment of the
-configured Dell display as the Bluetooth ownership signal. The active Mac
-safely ejects the configured keyfob, disconnects only the configured Magic
-Trackpad and Mouse, and switches the monitor input. When the Dell display
-appears on the other Mac, its screen watcher claims those two devices.
-
-First-time setup on **both** Macs:
-
-1. Install the Bluetooth CLI: `brew install blueutil`.
-2. Pair the Trackpad and Mouse with each Mac once.
-3. Allow Hammerspoon under **System Settings > Privacy & Security > Bluetooth**.
-4. Install/reload this Hammerspoon configuration.
-5. Keep Hammerspoon and the destination Mac awake while switching.
-
-Device addresses and the keyfob volume UUID live in
-`config/overrides/common.lua`. Generic timing, input values, and binary paths
-live under `dellKvm` in `config/defaults.lua`.
-
-The old `~/Scripts/switch-dell-monitor.sh` helper is no longer invoked by the
-hotkey. The tracked `scripts/switch-dell-monitor.sh` version validates the
-current input and command results, and attempts to reconnect local Bluetooth
-devices if the monitor switch fails.
+To test the switch directly from the repo, run
+`./scripts/switch-dell-monitor.sh switch`. This uses display 1 and input
+codes 15 and 25. Direct calls eject the keyfob only when you pass
+`--keyfob-volume-uuid UUID`. Run with `--help` for options.
+The Hammerspoon Console shows the script's exit status and output after
+using the shortcut.
 
 ## Recommended workflow across two laptops
 
@@ -159,9 +129,6 @@ devices if the monitor switch fails.
 3. Keep secrets and temporary experiments in `config/local.lua`.
 4. Add new automation as one module per concern under `modules/`.
 5. Keep module defaults in `config/defaults.lua` and avoid hard-coding paths.
-
-Example: keep `awake`/`jiggler` enabled on a MacBook Pro host, but disable
-them on a MacBook Air host that relies on Amphetamine instead.
 
 ## First-time setup per laptop
 

@@ -7,8 +7,6 @@ local modules = {
   "modules.ipc",
   "modules.keystrokes",
   "modules.dell_kvm",
-  "modules.awake",
-  "modules.jiggler",
 }
 
 for _, module_name in ipairs(modules) do
