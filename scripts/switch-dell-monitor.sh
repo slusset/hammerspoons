@@ -105,9 +105,10 @@ else
 fi
 
 # This Dell can report input 25 as 0x1919 (6425). Keep the write code at 25.
-if [[ "$current_input" == "6425" ]]; then
-  current_input=25
-fi
+case "$current_input" in
+  3855) current_input=15 ;;
+  6425) current_input=25 ;;
+esac
 
 case "$current_input" in
   "$input_a") target_input="$input_b" ;;
